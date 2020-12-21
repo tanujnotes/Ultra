@@ -41,6 +41,7 @@ public class OnSwipeTouchListener implements View.OnTouchListener {
 
         @Override
         public void onLongPress(MotionEvent motionEvent) {
+            onLongClick();
             super.onLongPress(motionEvent);
         }
 

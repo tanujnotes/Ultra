@@ -16,6 +16,7 @@
         android:layout_marginTop="24dp"
         android:layout_marginEnd="24dp"
         android:animateLayoutChanges="true"
+        android:gravity="center"
         android:orientation="vertical">
 
         <TextView
@@ -78,17 +79,6 @@
             android:textSize="26sp"
             tools:ignore="HardcodedText" />
 
-        <TextView
-            android:id="@+id/homeApp6"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-light"
-            android:hint="App"
-            android:paddingVertical="10dp"
-            android:textColor="@android:color/white"
-            android:textColorHint="@android:color/white"
-            android:textSize="26sp"
-            tools:ignore="HardcodedText" />
     </LinearLayout>
 
     <FrameLayout

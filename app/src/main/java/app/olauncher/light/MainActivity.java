@@ -2,17 +2,24 @@ package app.olauncher.light;
 
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.LauncherActivityInfo;
 import android.content.pm.LauncherApps;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.UserHandle;
 import android.os.UserManager;
+import android.provider.MediaStore;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -24,7 +31,8 @@ import static android.view.WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
 
 public class MainActivity extends Activity {
     private List<AppModel> appList = new ArrayList<>();
-    private View homeAppsLayout;
+    private LinearLayout homeAppsLayout;
+    private EditText search;
     private View appDrawer;
 
     @Override
@@ -42,6 +50,7 @@ public class MainActivity extends Activity {
         getWindow().addFlags(FLAG_LAYOUT_NO_LIMITS);
         findViewById(R.id.layout_main).setOnTouchListener(getSwipeGestureListener(this));
 
+        search = findViewById(R.id.search);
         homeAppsLayout = findViewById(R.id.home_apps_layout);
         appDrawer = findViewById(R.id.app_drawer_layout);
 
@@ -72,6 +81,7 @@ public class MainActivity extends Activity {
     }
 
     private void showAppList() {
+        search.setText("");
         homeAppsLayout.setVisibility(View.GONE);
         appDrawer.setVisibility(View.VISIBLE);
     }
@@ -93,20 +103,21 @@ public class MainActivity extends Activity {
             @Override
             public void onSwipeLeft() {
                 super.onSwipeLeft();
-//                openSwipeLeftApp();
+                Intent intent = new Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA);
+                startActivity(intent);
             }
 
             @Override
             public void onSwipeRight() {
                 super.onSwipeRight();
-//                openSwipeRightApp();
+                Intent intent = new Intent(Intent.ACTION_DIAL);
+                startActivity(intent);
             }
 
             @Override
             public void onSwipeUp() {
                 super.onSwipeUp();
                 showAppList();
-//                showAppList(Constants.FLAG_LAUNCH_APP);
             }
 
             @Override
@@ -115,35 +126,22 @@ public class MainActivity extends Activity {
                 expandNotificationDrawer();
             }
 
+            @TargetApi(Build.VERSION_CODES.N)
             @Override
             public void onLongClick() {
+                if (homeAppsLayout.getGravity() == Gravity.CENTER)
+                    homeAppsLayout.setGravity(Gravity.START);
+                else homeAppsLayout.setGravity(Gravity.CENTER);
                 super.onLongClick();
-//                try {
-//                    findNavController().navigate(R.id.action_mainFragment_to_settingsFragment)
-//                    viewModel.firstOpen(false)
-//                } catch (e: java.lang.Exception) {
-//                }
             }
 
             @Override
             public void onDoubleClick() {
-//                if (prefs.lockModeOn) {
-//                    if (Settings.System.canWrite(requireContext())) {
-//                        requireActivity().runOnUiThread {
-//                            blackOverlay.visibility = View.VISIBLE
-//                            setScreenTimeout()
-//                            hideNavBar()
-//                        }
-//                    } else {
-//                        lockPhone()
-//                    }
-//                }
                 super.onDoubleClick();
             }
 
             @Override
             public void onTripleClick() {
-//                if (prefs.lockModeOn) lockPhone();
                 super.onTripleClick();
             }
         };
