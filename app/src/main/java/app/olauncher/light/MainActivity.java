@@ -1,9 +1,9 @@
 package app.olauncher.light;
 
-
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.LauncherActivityInfo;
@@ -22,6 +22,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -30,10 +31,14 @@ import java.util.List;
 import static android.view.WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
 
 public class MainActivity extends Activity {
-    private List<AppModel> appList = new ArrayList<>();
+    private final List<AppModel> appList = new ArrayList<>();
     private LinearLayout homeAppsLayout;
     private EditText search;
     private View appDrawer;
+
+    public interface AppClickListener {
+        void appClicked(AppModel appModel);
+    }
 
     @Override
     public void onBackPressed() {
@@ -54,7 +59,7 @@ public class MainActivity extends Activity {
         homeAppsLayout = findViewById(R.id.home_apps_layout);
         appDrawer = findViewById(R.id.app_drawer_layout);
 
-        AppAdapter appAdapter = new AppAdapter(this, appList);
+        AppAdapter appAdapter = new AppAdapter(this, appList, getAppClickListener());
         ListView appListView = findViewById(R.id.app_list_view);
         appListView.setAdapter(appAdapter);
     }
@@ -64,7 +69,6 @@ public class MainActivity extends Activity {
         super.onStart();
         getAppsList();
     }
-
 
     private void getAppsList() {
         appList.clear();
@@ -96,6 +100,37 @@ public class MainActivity extends Activity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void launchApp(AppModel appModel) {
+        LauncherApps launcher = (LauncherApps) getSystemService(Context.LAUNCHER_APPS_SERVICE);
+        List<LauncherActivityInfo> appLaunchActivityList = launcher.getActivityList(appModel.appPackage, appModel.userHandle);
+        ComponentName componentName;
+
+        switch (appLaunchActivityList.size()) {
+            case 0:
+                Toast.makeText(this, "App not found", Toast.LENGTH_SHORT).show();
+                return;
+            case 1:
+                componentName = new ComponentName(appModel.appPackage, appLaunchActivityList.get(0).getName());
+                break;
+            default:
+                componentName = new ComponentName(
+                        appModel.appPackage, appLaunchActivityList.get(appLaunchActivityList.size() - 1).getName());
+                break;
+        }
+
+        try {
+            launcher.startMainActivity(componentName, appModel.userHandle, null, null);
+        } catch (SecurityException securityException) {
+            launcher.startMainActivity(componentName, android.os.Process.myUserHandle(), null, null);
+        } catch (Exception e) {
+            Toast.makeText(this, "Unable to launch app", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private AppClickListener getAppClickListener() {
+        return this::launchApp;
     }
 
     private View.OnTouchListener getSwipeGestureListener(Context context) {
@@ -161,17 +196,19 @@ public class MainActivity extends Activity {
 
     static class AppAdapter extends ArrayAdapter<AppModel> {
 
+        private final AppClickListener appClickListener;
+
         private static class ViewHolder {
             TextView appName;
             View indicator;
         }
 
-        public AppAdapter(Context context, List<AppModel> apps) {
+        public AppAdapter(Context context, List<AppModel> apps, AppClickListener appClickListener) {
             super(context, 0, apps);
+            this.appClickListener = appClickListener;
         }
 
         @Override
-
         public View getView(int position, View convertView, ViewGroup parent) {
             AppModel appModel = getItem(position);
             ViewHolder viewHolder;
@@ -185,7 +222,13 @@ public class MainActivity extends Activity {
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
+
+            viewHolder.appName.setTag(appModel);
             viewHolder.appName.setText(appModel.appLabel);
+            viewHolder.appName.setOnClickListener(view -> {
+                AppModel clickedAppModel = (AppModel) viewHolder.appName.getTag();
+                appClickListener.appClicked(clickedAppModel);
+            });
             if (appModel.userHandle == android.os.Process.myUserHandle())
                 viewHolder.indicator.setVisibility(View.GONE);
             else viewHolder.indicator.setVisibility(View.VISIBLE);
