@@ -59,7 +59,7 @@ public class MainActivity extends Activity {
         homeAppsLayout = findViewById(R.id.home_apps_layout);
         appDrawer = findViewById(R.id.app_drawer_layout);
 
-        AppAdapter appAdapter = new AppAdapter(this, appList, getAppClickListener());
+        AppAdapter appAdapter = new AppAdapter(this, appList, this::launchApp);
         ListView appListView = findViewById(R.id.app_list_view);
         appListView.setAdapter(appAdapter);
     }
@@ -127,10 +127,6 @@ public class MainActivity extends Activity {
         } catch (Exception e) {
             Toast.makeText(this, "Unable to launch app", Toast.LENGTH_SHORT).show();
         }
-    }
-
-    private AppClickListener getAppClickListener() {
-        return this::launchApp;
     }
 
     private View.OnTouchListener getSwipeGestureListener(Context context) {
