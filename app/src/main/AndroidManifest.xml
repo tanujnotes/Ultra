@@ -12,7 +12,7 @@
         android:roundIcon="@mipmap/ic_launcher_round">
         <activity
             android:name=".MainActivity"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar">
+            android:theme="@android:style/Theme.Wallpaper.NoTitleBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
