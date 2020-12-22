@@ -182,14 +182,14 @@ public class MainActivity extends Activity {
             boolean onTop = false;
 
             @Override
-            public void onScrollStateChanged(AbsListView absListView, int state) {
-                if (state == 1) {
-                    onTop = !absListView.canScrollVertically(-1);
+            public void onScrollStateChanged(AbsListView listView, int state) {
+                if (state == 1) { // dragging
+                    onTop = !listView.canScrollVertically(-1);
                     if (onTop) hideKeyboard();
-                } else if (state == 0) {
-                    if (!absListView.canScrollVertically(1)) {
-                        hideKeyboard();
-                    } else if (!absListView.canScrollVertically(-1)) {
+
+                } else if (state == 0) { // stopped
+                    if (!listView.canScrollVertically(1)) hideKeyboard();
+                    else if (!listView.canScrollVertically(-1)) {
                         if (onTop) backToHome();
                         else showKeyboard();
                     }
