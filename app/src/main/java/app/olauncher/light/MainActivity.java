@@ -20,6 +20,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.Filter;
@@ -48,10 +49,7 @@ public class MainActivity extends Activity {
 
     @Override
     public void onBackPressed() {
-        if (appDrawer.getVisibility() == View.VISIBLE) {
-            appDrawer.setVisibility(View.GONE);
-            homeAppsLayout.setVisibility(View.VISIBLE);
-        } else super.onBackPressed();
+        if (appDrawer.getVisibility() == View.VISIBLE) backToHome();
     }
 
     @Override
@@ -85,6 +83,7 @@ public class MainActivity extends Activity {
 
             }
         });
+        appListView.setOnScrollListener(getScrollListener());
     }
 
     @Override
@@ -93,17 +92,21 @@ public class MainActivity extends Activity {
         getAppsList();
     }
 
+    private void backToHome() {
+        appDrawer.setVisibility(View.GONE);
+        homeAppsLayout.setVisibility(View.VISIBLE);
+    }
+
     private void getAppsList() {
         appList.clear();
         UserManager userManager = (UserManager) getSystemService(Context.USER_SERVICE);
         LauncherApps launcherApps = (LauncherApps) getSystemService(Context.LAUNCHER_APPS_SERVICE);
         for (UserHandle profile : userManager.getUserProfiles()) {
-            for (LauncherActivityInfo activityInfo : launcherApps.getActivityList(null, profile)) {
+            for (LauncherActivityInfo activityInfo : launcherApps.getActivityList(null, profile))
                 appList.add(new AppModel(
                         activityInfo.getLabel().toString(),
                         activityInfo.getApplicationInfo().packageName,
                         profile));
-            }
         }
         Collections.sort(appList, (obj1, obj2) -> obj1.appLabel.compareToIgnoreCase(obj2.appLabel));
     }
@@ -142,9 +145,8 @@ public class MainActivity extends Activity {
     private void prepareToLaunchApp(AppModel appModel) {
         hideKeyboard();
         launchApp(appModel);
+        backToHome();
         search.setText("");
-        appDrawer.setVisibility(View.GONE);
-        homeAppsLayout.setVisibility(View.VISIBLE);
     }
 
     private void launchApp(AppModel appModel) {
@@ -172,6 +174,33 @@ public class MainActivity extends Activity {
         } catch (Exception e) {
             Toast.makeText(this, "Unable to launch app", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private AbsListView.OnScrollListener getScrollListener() {
+        return new AbsListView.OnScrollListener() {
+
+            boolean onTop = false;
+
+            @Override
+            public void onScrollStateChanged(AbsListView absListView, int state) {
+                if (state == 1) {
+                    onTop = !absListView.canScrollVertically(-1);
+                    if (onTop) hideKeyboard();
+                } else if (state == 0) {
+                    if (!absListView.canScrollVertically(1)) {
+                        hideKeyboard();
+                    } else if (!absListView.canScrollVertically(-1)) {
+                        if (onTop) backToHome();
+                        else showKeyboard();
+                    }
+                }
+            }
+
+            @Override
+            public void onScroll(AbsListView absListView, int i, int i1, int i2) {
+
+            }
+        };
     }
 
     private View.OnTouchListener getSwipeGestureListener(Context context) {
