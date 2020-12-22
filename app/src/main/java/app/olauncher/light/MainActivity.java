@@ -31,6 +31,7 @@ import android.widget.Toast;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static android.view.WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
@@ -104,6 +105,7 @@ public class MainActivity extends Activity {
                         profile));
             }
         }
+        Collections.sort(appList, (obj1, obj2) -> obj1.appLabel.compareToIgnoreCase(obj2.appLabel));
     }
 
     private void showAppList() {
