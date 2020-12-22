@@ -13,12 +13,17 @@ import android.os.Bundle;
 import android.os.UserHandle;
 import android.os.UserManager;
 import android.provider.MediaStore;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.BaseAdapter;
 import android.widget.EditText;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -62,6 +67,23 @@ public class MainActivity extends Activity {
         AppAdapter appAdapter = new AppAdapter(this, appList, this::launchApp);
         ListView appListView = findViewById(R.id.app_list_view);
         appListView.setAdapter(appAdapter);
+
+        search.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                appAdapter.getFilter().filter(charSequence);
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
     }
 
     @Override
@@ -85,9 +107,22 @@ public class MainActivity extends Activity {
     }
 
     private void showAppList() {
+        showKeyboard();
         search.setText("");
         homeAppsLayout.setVisibility(View.GONE);
         appDrawer.setVisibility(View.VISIBLE);
+    }
+
+    private void showKeyboard() {
+        search.requestFocus();
+        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+    }
+
+    private void hideKeyboard() {
+        search.clearFocus();
+        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(search.getWindowToken(), 0);
     }
 
     @SuppressLint({"WrongConstant", "PrivateApi"})
@@ -190,9 +225,12 @@ public class MainActivity extends Activity {
         }
     }
 
-    static class AppAdapter extends ArrayAdapter<AppModel> {
+    static class AppAdapter extends BaseAdapter implements Filterable {
 
+        private final Context context;
         private final AppClickListener appClickListener;
+        private List<AppModel> filteredAppsList;
+        private final List<AppModel> allAppsList;
 
         private static class ViewHolder {
             TextView appName;
@@ -200,17 +238,34 @@ public class MainActivity extends Activity {
         }
 
         public AppAdapter(Context context, List<AppModel> apps, AppClickListener appClickListener) {
-            super(context, 0, apps);
+            this.context = context;
             this.appClickListener = appClickListener;
+            this.filteredAppsList = apps;
+            this.allAppsList = apps;
+        }
+
+        @Override
+        public int getCount() {
+            return filteredAppsList.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return filteredAppsList.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            AppModel appModel = getItem(position);
+            AppModel appModel = (AppModel) getItem(position);
             ViewHolder viewHolder;
             if (convertView == null) {
                 viewHolder = new ViewHolder();
-                LayoutInflater inflater = LayoutInflater.from(getContext());
+                LayoutInflater inflater = LayoutInflater.from(context);
                 convertView = inflater.inflate(R.layout.adapter_app, parent, false);
                 viewHolder.appName = convertView.findViewById(R.id.app_name);
                 viewHolder.indicator = convertView.findViewById(R.id.other_profile_indicator);
@@ -229,6 +284,41 @@ public class MainActivity extends Activity {
                 viewHolder.indicator.setVisibility(View.GONE);
             else viewHolder.indicator.setVisibility(View.VISIBLE);
             return convertView;
+        }
+
+        @Override
+        public Filter getFilter() {
+
+            return new Filter() {
+
+                @SuppressWarnings("unchecked")
+                @Override
+                protected void publishResults(CharSequence constraint, FilterResults results) {
+                    filteredAppsList = (List<AppModel>) results.values;
+                    notifyDataSetChanged();
+                }
+
+                @Override
+                protected FilterResults performFiltering(CharSequence constraint) {
+                    FilterResults results = new FilterResults();
+                    List<AppModel> filteredApps = new ArrayList<>();
+
+                    if (constraint.toString().isEmpty())
+                        filteredApps = allAppsList;
+                    else {
+                        constraint = constraint.toString().toLowerCase();
+                        for (int i = 0; i < allAppsList.size(); i++) {
+                            AppModel app = allAppsList.get(i);
+                            if (app.appLabel.toLowerCase().contains(constraint))
+                                filteredApps.add(app);
+                        }
+                    }
+
+                    results.count = filteredApps.size();
+                    results.values = filteredApps;
+                    return results;
+                }
+            };
         }
     }
 }
