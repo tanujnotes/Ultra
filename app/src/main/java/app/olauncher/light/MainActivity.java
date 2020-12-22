@@ -64,7 +64,7 @@ public class MainActivity extends Activity {
         homeAppsLayout = findViewById(R.id.home_apps_layout);
         appDrawer = findViewById(R.id.app_drawer_layout);
 
-        AppAdapter appAdapter = new AppAdapter(this, appList, this::launchApp);
+        AppAdapter appAdapter = new AppAdapter(this, appList, this::prepareToLaunchApp);
         ListView appListView = findViewById(R.id.app_list_view);
         appListView.setAdapter(appAdapter);
 
@@ -135,6 +135,14 @@ public class MainActivity extends Activity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void prepareToLaunchApp(AppModel appModel) {
+        hideKeyboard();
+        launchApp(appModel);
+        search.setText("");
+        appDrawer.setVisibility(View.GONE);
+        homeAppsLayout.setVisibility(View.VISIBLE);
     }
 
     private void launchApp(AppModel appModel) {
@@ -283,6 +291,9 @@ public class MainActivity extends Activity {
             if (appModel.userHandle == android.os.Process.myUserHandle())
                 viewHolder.indicator.setVisibility(View.GONE);
             else viewHolder.indicator.setVisibility(View.VISIBLE);
+
+            if (getCount() == 1) appClickListener.appClicked(appModel);
+
             return convertView;
         }
 
