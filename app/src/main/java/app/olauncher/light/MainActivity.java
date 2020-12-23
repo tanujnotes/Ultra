@@ -1,14 +1,12 @@
 package app.olauncher.light;
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.LauncherActivityInfo;
 import android.content.pm.LauncherApps;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.UserHandle;
 import android.os.UserManager;
@@ -132,6 +130,23 @@ public class MainActivity extends Activity {
         inputMethodManager.hideSoftInputFromWindow(search.getWindowToken(), 0);
     }
 
+    private void changeHomeAppAlignment() {
+        switch (prefs.getHomeAlignment()) {
+            default:
+                homeAppsLayout.setGravity(Gravity.CENTER);
+                prefs.setHomeAlignment(Gravity.CENTER);
+                break;
+            case Gravity.CENTER:
+                homeAppsLayout.setGravity(Gravity.END);
+                prefs.setHomeAlignment(Gravity.END);
+                break;
+            case Gravity.END:
+                homeAppsLayout.setGravity(Gravity.START);
+                prefs.setHomeAlignment(Gravity.START);
+                break;
+        }
+    }
+
     @SuppressLint({"WrongConstant", "PrivateApi"})
     private void expandNotificationDrawer() {
         try {
@@ -233,23 +248,9 @@ public class MainActivity extends Activity {
                 expandNotificationDrawer();
             }
 
-            @TargetApi(Build.VERSION_CODES.N)
             @Override
             public void onLongClick() {
-                switch (prefs.getHomeAlignment()) {
-                    default:
-                        homeAppsLayout.setGravity(Gravity.CENTER);
-                        prefs.setHomeAlignment(Gravity.CENTER);
-                        break;
-                    case Gravity.CENTER:
-                        homeAppsLayout.setGravity(Gravity.END);
-                        prefs.setHomeAlignment(Gravity.END);
-                        break;
-                    case Gravity.END:
-                        homeAppsLayout.setGravity(Gravity.START);
-                        prefs.setHomeAlignment(Gravity.START);
-                        break;
-                }
+                runOnUiThread(() -> changeHomeAppAlignment());
             }
 
             @Override

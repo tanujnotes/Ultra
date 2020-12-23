@@ -5,11 +5,15 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import static java.lang.Math.abs;
 
 public class OnSwipeTouchListener implements View.OnTouchListener {
 
-    private GestureDetector gestureDetector;
+    private boolean longPressOn = false;
+    private final GestureDetector gestureDetector;
 
     public OnSwipeTouchListener(Context context) {
         gestureDetector = new GestureDetector(context, new GestureListener());
@@ -17,6 +21,7 @@ public class OnSwipeTouchListener implements View.OnTouchListener {
 
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
+        if (motionEvent.getAction() == MotionEvent.ACTION_UP) longPressOn = false;
         return gestureDetector.onTouchEvent(motionEvent);
     }
 
@@ -41,7 +46,13 @@ public class OnSwipeTouchListener implements View.OnTouchListener {
 
         @Override
         public void onLongPress(MotionEvent motionEvent) {
-            onLongClick();
+            longPressOn = true;
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    if (longPressOn) onLongClick();
+                }
+            }, 500);
             super.onLongPress(motionEvent);
         }
 
