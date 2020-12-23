@@ -97,11 +97,11 @@ public class MainActivity extends Activity implements View.OnClickListener, View
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        getAppsList();
-        populateHomeApps();
+    protected void onResume() {
+        super.onResume();
         backToHome();
+        populateHomeApps();
+        getAppsList();
     }
 
     @Override
@@ -318,7 +318,7 @@ public class MainActivity extends Activity implements View.OnClickListener, View
             startActivity(intent);
             packageManager.setComponentEnabledSetting(
                     componentName,
-                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
                     PackageManager.DONT_KILL_APP
             );
         } catch (Exception e) {
