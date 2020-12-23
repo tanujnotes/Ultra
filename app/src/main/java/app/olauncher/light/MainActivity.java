@@ -35,15 +35,19 @@ import java.util.List;
 
 import static android.view.WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements View.OnClickListener, View.OnLongClickListener {
     private final List<AppModel> appList = new ArrayList<>();
+    private final int FLAG_LAUNCH_APP = 0;
+
     private Prefs prefs;
-    private LinearLayout homeAppsLayout;
-    private EditText search;
     private View appDrawer;
+    private EditText search;
+    private AppAdapter appAdapter;
+    private LinearLayout homeAppsLayout;
+    private TextView homeApp1, homeApp2, homeApp3, homeApp4, homeApp5, homeApp6;
 
     public interface AppClickListener {
-        void appClicked(AppModel appModel);
+        void appClicked(AppModel appModel, int flag);
     }
 
     @Override
@@ -58,12 +62,14 @@ public class MainActivity extends Activity {
         getWindow().addFlags(FLAG_LAYOUT_NO_LIMITS);
         findViewById(R.id.layout_main).setOnTouchListener(getSwipeGestureListener(this));
 
+        initClickListeners();
+
         prefs = new Prefs(this);
         search = findViewById(R.id.search);
         homeAppsLayout = findViewById(R.id.home_apps_layout);
         appDrawer = findViewById(R.id.app_drawer_layout);
 
-        AppAdapter appAdapter = new AppAdapter(this, appList, this::prepareToLaunchApp);
+        appAdapter = new AppAdapter(this, appList, getAppClickListener());
         ListView appListView = findViewById(R.id.app_list_view);
         appListView.setAdapter(appAdapter);
 
@@ -90,11 +96,72 @@ public class MainActivity extends Activity {
     protected void onStart() {
         super.onStart();
         getAppsList();
+        populateHomeApps();
+        hideKeyboard();
+    }
+
+    @Override
+    public void onClick(View view) {
+        try {
+            int location = Integer.parseInt(view.getTag().toString());
+            homeAppClicked(location);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public boolean onLongClick(View view) {
+        try {
+            int location = Integer.parseInt(view.getTag().toString());
+            showAppList(location);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
+
+    private void initClickListeners() {
+        homeApp1 = findViewById(R.id.home_app_1);
+        homeApp2 = findViewById(R.id.home_app_2);
+        homeApp3 = findViewById(R.id.home_app_3);
+        homeApp4 = findViewById(R.id.home_app_4);
+        homeApp5 = findViewById(R.id.home_app_5);
+        homeApp6 = findViewById(R.id.home_app_6);
+
+        homeApp1.setOnClickListener(this);
+        homeApp2.setOnClickListener(this);
+        homeApp3.setOnClickListener(this);
+        homeApp4.setOnClickListener(this);
+        homeApp5.setOnClickListener(this);
+        homeApp6.setOnClickListener(this);
+
+        homeApp1.setOnLongClickListener(this);
+        homeApp2.setOnLongClickListener(this);
+        homeApp3.setOnLongClickListener(this);
+        homeApp4.setOnLongClickListener(this);
+        homeApp5.setOnLongClickListener(this);
+        homeApp6.setOnLongClickListener(this);
+    }
+
+    private void populateHomeApps() {
+        homeApp1.setText(prefs.getAppName(1));
+        homeApp2.setText(prefs.getAppName(2));
+        homeApp3.setText(prefs.getAppName(3));
+        homeApp4.setText(prefs.getAppName(4));
+        homeApp5.setText(prefs.getAppName(5));
+        homeApp6.setText(prefs.getAppName(6));
+    }
+
+    private void showLongPressToast() {
+        Toast.makeText(this, "Long press to select app", Toast.LENGTH_SHORT).show();
     }
 
     private void backToHome() {
         appDrawer.setVisibility(View.GONE);
         homeAppsLayout.setVisibility(View.VISIBLE);
+        appAdapter.setFlag(FLAG_LAUNCH_APP);
+        hideKeyboard();
     }
 
     private void getAppsList() {
@@ -111,9 +178,10 @@ public class MainActivity extends Activity {
         Collections.sort(appList, (obj1, obj2) -> obj1.appLabel.compareToIgnoreCase(obj2.appLabel));
     }
 
-    private void showAppList() {
+    private void showAppList(int flag) {
         showKeyboard();
         search.setText("");
+        appAdapter.setFlag(flag);
         homeAppsLayout.setVisibility(View.GONE);
         appDrawer.setVisibility(View.VISIBLE);
     }
@@ -166,6 +234,14 @@ public class MainActivity extends Activity {
         search.setText("");
     }
 
+    private void homeAppClicked(int location) {
+        if (prefs.getAppPackage(location).isEmpty()) showLongPressToast();
+        else launchApp(getAppModel(
+                prefs.getAppName(location),
+                prefs.getAppPackage(location),
+                prefs.getAppUserHandle(location)));
+    }
+
     private void launchApp(AppModel appModel) {
         LauncherApps launcher = (LauncherApps) getSystemService(Context.LAUNCHER_APPS_SERVICE);
         List<LauncherActivityInfo> appLaunchActivityList = launcher.getActivityList(appModel.appPackage, appModel.userHandle);
@@ -191,6 +267,31 @@ public class MainActivity extends Activity {
         } catch (Exception e) {
             Toast.makeText(this, "Unable to launch app", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void setHomeApp(AppModel appModel, int flag) {
+        prefs.setHomeApp(appModel, flag);
+        backToHome();
+        populateHomeApps();
+    }
+
+    private AppClickListener getAppClickListener() {
+        return (appModel, flag) -> {
+            if (flag == FLAG_LAUNCH_APP) prepareToLaunchApp(appModel);
+            else setHomeApp(appModel, flag);
+        };
+    }
+
+    private AppModel getAppModel(String appLabel, String appPackage, String appUserHandle) {
+        return new AppModel(appLabel, appPackage, getUserHandleFromString(appUserHandle));
+    }
+
+    private UserHandle getUserHandleFromString(String appUserHandleString) {
+        UserManager userManager = (UserManager) getSystemService(Context.USER_SERVICE);
+        for (UserHandle userHandle : userManager.getUserProfiles())
+            if (userHandle.toString().equals(appUserHandleString))
+                return userHandle;
+        return android.os.Process.myUserHandle();
     }
 
     private AbsListView.OnScrollListener getScrollListener() {
@@ -239,7 +340,7 @@ public class MainActivity extends Activity {
             @Override
             public void onSwipeUp() {
                 super.onSwipeUp();
-                showAppList();
+                showAppList(FLAG_LAUNCH_APP);
             }
 
             @Override
@@ -283,6 +384,7 @@ public class MainActivity extends Activity {
         private final AppClickListener appClickListener;
         private List<AppModel> filteredAppsList;
         private final List<AppModel> allAppsList;
+        private int flag = 0;
 
         private static class ViewHolder {
             TextView appName;
@@ -294,6 +396,10 @@ public class MainActivity extends Activity {
             this.appClickListener = appClickListener;
             this.filteredAppsList = apps;
             this.allAppsList = apps;
+        }
+
+        public void setFlag(int flag) {
+            this.flag = flag;
         }
 
         @Override
@@ -330,13 +436,13 @@ public class MainActivity extends Activity {
             viewHolder.appName.setText(appModel.appLabel);
             viewHolder.appName.setOnClickListener(view -> {
                 AppModel clickedAppModel = (AppModel) viewHolder.appName.getTag();
-                appClickListener.appClicked(clickedAppModel);
+                appClickListener.appClicked(clickedAppModel, flag);
             });
             if (appModel.userHandle == android.os.Process.myUserHandle())
                 viewHolder.indicator.setVisibility(View.GONE);
             else viewHolder.indicator.setVisibility(View.VISIBLE);
 
-            if (getCount() == 1) appClickListener.appClicked(appModel);
+            if (flag == 0 && getCount() == 1) appClickListener.appClicked(appModel, flag);
 
             return convertView;
         }

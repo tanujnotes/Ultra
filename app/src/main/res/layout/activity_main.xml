@@ -20,7 +20,7 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/homeApp1"
+            android:id="@+id/home_app_1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-light"
@@ -32,13 +32,14 @@
             android:shadowDx="1"
             android:shadowDy="1"
             android:shadowRadius="1"
+            android:tag="1"
             android:textColor="@android:color/white"
             android:textColorHint="@android:color/white"
             android:textSize="28sp"
             tools:ignore="HardcodedText" />
 
         <TextView
-            android:id="@+id/homeApp2"
+            android:id="@+id/home_app_2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-light"
@@ -50,13 +51,14 @@
             android:shadowDx="1"
             android:shadowDy="1"
             android:shadowRadius="1"
+            android:tag="2"
             android:textColor="@android:color/white"
             android:textColorHint="@android:color/white"
             android:textSize="28sp"
             tools:ignore="HardcodedText" />
 
         <TextView
-            android:id="@+id/homeApp3"
+            android:id="@+id/home_app_3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-light"
@@ -68,13 +70,14 @@
             android:shadowDx="1"
             android:shadowDy="1"
             android:shadowRadius="1"
+            android:tag="3"
             android:textColor="@android:color/white"
             android:textColorHint="@android:color/white"
             android:textSize="28sp"
             tools:ignore="HardcodedText" />
 
         <TextView
-            android:id="@+id/homeApp4"
+            android:id="@+id/home_app_4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-light"
@@ -86,13 +89,14 @@
             android:shadowDx="1"
             android:shadowDy="1"
             android:shadowRadius="1"
+            android:tag="4"
             android:textColor="@android:color/white"
             android:textColorHint="@android:color/white"
             android:textSize="28sp"
             tools:ignore="HardcodedText" />
 
         <TextView
-            android:id="@+id/homeApp5"
+            android:id="@+id/home_app_5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-light"
@@ -104,13 +108,14 @@
             android:shadowDx="1"
             android:shadowDy="1"
             android:shadowRadius="1"
+            android:tag="5"
             android:textColor="@android:color/white"
             android:textColorHint="@android:color/white"
             android:textSize="28sp"
             tools:ignore="HardcodedText" />
 
         <TextView
-            android:id="@+id/homeApp6"
+            android:id="@+id/home_app_6"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-light"
@@ -122,6 +127,7 @@
             android:shadowDx="1"
             android:shadowDy="1"
             android:shadowRadius="1"
+            android:tag="6"
             android:textColor="@android:color/white"
             android:textColorHint="@android:color/white"
             android:textSize="28sp"
@@ -149,6 +155,8 @@
             android:cursorVisible="false"
             android:fontFamily="sans-serif-light"
             android:hint="__"
+            android:imeOptions="actionNone"
+            android:inputType="text"
             android:lines="1"
             android:maxLength="20"
             android:maxLines="1"
