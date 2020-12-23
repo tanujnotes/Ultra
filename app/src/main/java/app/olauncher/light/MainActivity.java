@@ -39,6 +39,7 @@ import static android.view.WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
 
 public class MainActivity extends Activity {
     private final List<AppModel> appList = new ArrayList<>();
+    private Prefs prefs;
     private LinearLayout homeAppsLayout;
     private EditText search;
     private View appDrawer;
@@ -59,6 +60,7 @@ public class MainActivity extends Activity {
         getWindow().addFlags(FLAG_LAYOUT_NO_LIMITS);
         findViewById(R.id.layout_main).setOnTouchListener(getSwipeGestureListener(this));
 
+        prefs = new Prefs(this);
         search = findViewById(R.id.search);
         homeAppsLayout = findViewById(R.id.home_apps_layout);
         appDrawer = findViewById(R.id.app_drawer_layout);
@@ -234,10 +236,20 @@ public class MainActivity extends Activity {
             @TargetApi(Build.VERSION_CODES.N)
             @Override
             public void onLongClick() {
-                if (homeAppsLayout.getGravity() == Gravity.CENTER)
-                    homeAppsLayout.setGravity(Gravity.START);
-                else homeAppsLayout.setGravity(Gravity.CENTER);
-                super.onLongClick();
+                switch (prefs.getHomeAlignment()) {
+                    default:
+                        homeAppsLayout.setGravity(Gravity.CENTER);
+                        prefs.setHomeAlignment(Gravity.CENTER);
+                        break;
+                    case Gravity.CENTER:
+                        homeAppsLayout.setGravity(Gravity.END);
+                        prefs.setHomeAlignment(Gravity.END);
+                        break;
+                    case Gravity.END:
+                        homeAppsLayout.setGravity(Gravity.START);
+                        prefs.setHomeAlignment(Gravity.START);
+                        break;
+                }
             }
 
             @Override
