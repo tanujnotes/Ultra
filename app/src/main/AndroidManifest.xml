@@ -7,9 +7,9 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/logo"
         android:label="Olauncher Light"
-        android:roundIcon="@mipmap/ic_launcher_round">
+        android:roundIcon="@drawable/logo">
 
         <activity
             android:name=".MainActivity"
