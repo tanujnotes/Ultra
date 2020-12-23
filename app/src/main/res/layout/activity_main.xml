@@ -135,12 +135,26 @@
 
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/set_as_default_launcher"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="48dp"
+        android:padding="8dp"
+        android:text="Set as default launcher"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        tools:ignore="HardcodedText" />
+
     <FrameLayout
         android:id="@+id/app_drawer_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:animateLayoutChanges="true"
         android:background="#19000000"
+        android:clickable="true"
+        android:focusable="true"
         android:orientation="vertical"
         android:visibility="gone">
 

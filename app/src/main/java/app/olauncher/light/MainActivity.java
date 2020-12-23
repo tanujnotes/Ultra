@@ -7,10 +7,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.LauncherActivityInfo;
 import android.content.pm.LauncherApps;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.UserHandle;
 import android.os.UserManager;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Gravity;
@@ -44,7 +48,7 @@ public class MainActivity extends Activity implements View.OnClickListener, View
     private EditText search;
     private AppAdapter appAdapter;
     private LinearLayout homeAppsLayout;
-    private TextView homeApp1, homeApp2, homeApp3, homeApp4, homeApp5, homeApp6;
+    private TextView homeApp1, homeApp2, homeApp3, homeApp4, homeApp5, homeApp6, setDefaultLauncher;
 
     public interface AppClickListener {
         void appClicked(AppModel appModel, int flag);
@@ -97,11 +101,15 @@ public class MainActivity extends Activity implements View.OnClickListener, View
         super.onStart();
         getAppsList();
         populateHomeApps();
-        hideKeyboard();
+        backToHome();
     }
 
     @Override
     public void onClick(View view) {
+        if (view.getId() == R.id.set_as_default_launcher) {
+            resetDefaultLauncher();
+            return;
+        }
         try {
             int location = Integer.parseInt(view.getTag().toString());
             homeAppClicked(location);
@@ -122,6 +130,9 @@ public class MainActivity extends Activity implements View.OnClickListener, View
     }
 
     private void initClickListeners() {
+        setDefaultLauncher = findViewById(R.id.set_as_default_launcher);
+        setDefaultLauncher.setOnClickListener(this);
+
         homeApp1 = findViewById(R.id.home_app_1);
         homeApp2 = findViewById(R.id.home_app_2);
         homeApp3 = findViewById(R.id.home_app_3);
@@ -162,6 +173,7 @@ public class MainActivity extends Activity implements View.OnClickListener, View
         homeAppsLayout.setVisibility(View.VISIBLE);
         appAdapter.setFlag(FLAG_LAUNCH_APP);
         hideKeyboard();
+        checkForDefaultLauncher();
     }
 
     private void getAppsList() {
@@ -179,6 +191,7 @@ public class MainActivity extends Activity implements View.OnClickListener, View
     }
 
     private void showAppList(int flag) {
+        setDefaultLauncher.setVisibility(View.GONE);
         showKeyboard();
         search.setText("");
         appAdapter.setFlag(flag);
@@ -273,6 +286,57 @@ public class MainActivity extends Activity implements View.OnClickListener, View
         prefs.setHomeApp(appModel, flag);
         backToHome();
         populateHomeApps();
+    }
+
+    private void checkForDefaultLauncher() {
+        if (BuildConfig.APPLICATION_ID.equals(getDefaultLauncherPackage()))
+            setDefaultLauncher.setVisibility(View.GONE);
+        else setDefaultLauncher.setVisibility(View.VISIBLE);
+    }
+
+    private String getDefaultLauncherPackage() {
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_HOME);
+        ResolveInfo result = getPackageManager().resolveActivity(intent, 0);
+        if (result == null && result.activityInfo == null)
+            return "android";
+        return result.activityInfo.packageName;
+    }
+
+    private void resetDefaultLauncher() {
+        try {
+            PackageManager packageManager = getPackageManager();
+            ComponentName componentName = new ComponentName(this, FakeHomeActivity.class);
+            packageManager.setComponentEnabledSetting(
+                    componentName,
+                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                    PackageManager.DONT_KILL_APP
+            );
+            Intent intent = new Intent(Intent.ACTION_MAIN);
+            intent.addCategory(Intent.CATEGORY_HOME);
+            startActivity(intent);
+            packageManager.setComponentEnabledSetting(
+                    componentName,
+                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                    PackageManager.DONT_KILL_APP
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (getDefaultLauncherPackage().contains("."))
+            openLauncherPhoneSettings();
+    }
+
+    private void openLauncherPhoneSettings() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            Toast.makeText(this, "Set Olauncher Light as default launcher", Toast.LENGTH_LONG).show();
+            startActivity(new Intent(Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS));
+        } else {
+            Toast.makeText(this, "Search for launcher or home apps", Toast.LENGTH_LONG).show();
+            startActivity(new Intent(Settings.ACTION_SETTINGS));
+        }
     }
 
     private AppClickListener getAppClickListener() {

@@ -10,15 +10,38 @@
         android:icon="@mipmap/ic_launcher"
         android:label="Olauncher Light"
         android:roundIcon="@mipmap/ic_launcher_round">
+
         <activity
             android:name=".MainActivity"
-            android:theme="@android:style/Theme.Wallpaper.NoTitleBar">
+            android:excludeFromRecents="true"
+            android:launchMode="singleTask"
+            android:taskAffinity=""
+            android:theme="@android:style/Theme.Wallpaper.NoTitleBar"
+            android:windowSoftInputMode="stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
+                <category android:name="android.intent.category.HOME" />
+                <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".FakeHomeActivity"
+            android:enabled="false"
+            android:launchMode="singleTask"
+            android:theme="@android:style/Theme.Holo.NoActionBar"
+            android:windowSoftInputMode="stateHidden">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.HOME" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
     </application>
 
 </manifest>
