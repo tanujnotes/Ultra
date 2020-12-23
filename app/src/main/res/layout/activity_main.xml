@@ -25,10 +25,16 @@
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-light"
             android:hint="App"
+            android:lines="1"
+            android:maxLines="1"
             android:paddingVertical="10dp"
+            android:shadowColor="#55000000"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="1"
             android:textColor="@android:color/white"
             android:textColorHint="@android:color/white"
-            android:textSize="26sp"
+            android:textSize="28sp"
             tools:ignore="HardcodedText" />
 
         <TextView
@@ -37,10 +43,16 @@
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-light"
             android:hint="App"
+            android:lines="1"
+            android:maxLines="1"
             android:paddingVertical="10dp"
+            android:shadowColor="#55000000"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="1"
             android:textColor="@android:color/white"
             android:textColorHint="@android:color/white"
-            android:textSize="26sp"
+            android:textSize="28sp"
             tools:ignore="HardcodedText" />
 
         <TextView
@@ -49,10 +61,16 @@
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-light"
             android:hint="App"
+            android:lines="1"
+            android:maxLines="1"
             android:paddingVertical="10dp"
+            android:shadowColor="#55000000"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="1"
             android:textColor="@android:color/white"
             android:textColorHint="@android:color/white"
-            android:textSize="26sp"
+            android:textSize="28sp"
             tools:ignore="HardcodedText" />
 
         <TextView
@@ -61,10 +79,16 @@
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-light"
             android:hint="App"
+            android:lines="1"
+            android:maxLines="1"
             android:paddingVertical="10dp"
+            android:shadowColor="#55000000"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="1"
             android:textColor="@android:color/white"
             android:textColorHint="@android:color/white"
-            android:textSize="26sp"
+            android:textSize="28sp"
             tools:ignore="HardcodedText" />
 
         <TextView
@@ -73,10 +97,34 @@
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-light"
             android:hint="App"
+            android:lines="1"
+            android:maxLines="1"
             android:paddingVertical="10dp"
+            android:shadowColor="#55000000"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="1"
             android:textColor="@android:color/white"
             android:textColorHint="@android:color/white"
-            android:textSize="26sp"
+            android:textSize="28sp"
+            tools:ignore="HardcodedText" />
+
+        <TextView
+            android:id="@+id/homeApp6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-light"
+            android:hint="App"
+            android:lines="1"
+            android:maxLines="1"
+            android:paddingVertical="10dp"
+            android:shadowColor="#55000000"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="1"
+            android:textColor="@android:color/white"
+            android:textColorHint="@android:color/white"
+            android:textSize="28sp"
             tools:ignore="HardcodedText" />
 
     </LinearLayout>
@@ -86,6 +134,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:animateLayoutChanges="true"
+        android:background="#19000000"
         android:orientation="vertical"
         android:visibility="gone">
 
@@ -100,9 +149,16 @@
             android:cursorVisible="false"
             android:fontFamily="sans-serif-light"
             android:hint="__"
+            android:lines="1"
+            android:maxLength="20"
+            android:maxLines="1"
+            android:shadowColor="#40000000"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="1"
             android:textColor="@android:color/white"
             android:textColorHint="@android:color/white"
-            android:textSize="26sp"
+            android:textSize="28sp"
             tools:ignore="HardcodedText" />
 
         <ListView

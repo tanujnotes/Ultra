@@ -10,10 +10,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fontFamily="sans-serif-light"
-        android:paddingHorizontal="24dp"
+        android:lines="1"
+        android:maxLines="1"
         android:paddingVertical="12dp"
+        android:paddingStart="24dp"
+        android:paddingEnd="12dp"
+        android:shadowColor="#66000000"
+        android:shadowDx="1"
+        android:shadowDy="1"
+        android:shadowRadius="1"
         android:textColor="@android:color/white"
-        android:textSize="26sp"
+        android:textSize="28sp"
         tools:ignore="HardcodedText" />
 
     <TextView
