@@ -8,6 +8,8 @@ public class Prefs {
 
     private static final String PREF = "app.olauncher.light";
     private static final String HOME_ALIGNMENT = "HOME_ALIGNMENT";
+    private static final String SHOW_LOCK_POPUP = "SHOW_LOCK_POPUP";
+    private static final String SCREEN_TIMEOUT = "SCREEN_TIMEOUT";
 
     private static final String APP_NAME_1 = "APP_NAME_1";
     private static final String APP_NAME_2 = "APP_NAME_2";
@@ -45,6 +47,22 @@ public class Prefs {
 
     public void setHomeAlignment(int gravity) {
         getSharedPref().edit().putInt(HOME_ALIGNMENT, gravity).apply();
+    }
+
+    public boolean getShowLockPopup() {
+        return getSharedPref().getBoolean(SHOW_LOCK_POPUP, true);
+    }
+
+    public void setShowLockPopup(boolean value) {
+        getSharedPref().edit().putBoolean(SHOW_LOCK_POPUP, value).apply();
+    }
+
+    public int getScreenTimeout() {
+        return getSharedPref().getInt(SCREEN_TIMEOUT, 30000);
+    }
+
+    public void setScreenTimeout(int value) {
+        getSharedPref().edit().putInt(SCREEN_TIMEOUT, value).apply();
     }
 
     public String getAppName(int location) {

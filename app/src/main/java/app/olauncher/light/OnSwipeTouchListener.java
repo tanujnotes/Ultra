@@ -41,6 +41,7 @@ public class OnSwipeTouchListener implements View.OnTouchListener {
 
         @Override
         public boolean onDoubleTap(MotionEvent motionEvent) {
+            onDoubleClick();
             return super.onDoubleTap(motionEvent);
         }
 
