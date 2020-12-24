@@ -101,7 +101,7 @@ public class MainActivity extends Activity implements View.OnClickListener, View
         super.onResume();
         backToHome();
         populateHomeApps();
-        getAppsList();
+        refreshAppsList();
     }
 
     @Override
@@ -176,18 +176,21 @@ public class MainActivity extends Activity implements View.OnClickListener, View
         checkForDefaultLauncher();
     }
 
-    private void getAppsList() {
-        appList.clear();
-        UserManager userManager = (UserManager) getSystemService(Context.USER_SERVICE);
-        LauncherApps launcherApps = (LauncherApps) getSystemService(Context.LAUNCHER_APPS_SERVICE);
-        for (UserHandle profile : userManager.getUserProfiles()) {
-            for (LauncherActivityInfo activityInfo : launcherApps.getActivityList(null, profile))
-                appList.add(new AppModel(
-                        activityInfo.getLabel().toString(),
-                        activityInfo.getApplicationInfo().packageName,
-                        profile));
-        }
-        Collections.sort(appList, (obj1, obj2) -> obj1.appLabel.compareToIgnoreCase(obj2.appLabel));
+    private void refreshAppsList() {
+        new Thread(() -> {
+            appList.clear();
+            UserManager userManager = (UserManager) getSystemService(Context.USER_SERVICE);
+            LauncherApps launcherApps = (LauncherApps) getSystemService(Context.LAUNCHER_APPS_SERVICE);
+            for (UserHandle profile : userManager.getUserProfiles()) {
+                for (LauncherActivityInfo activityInfo : launcherApps.getActivityList(null, profile))
+                    if (!activityInfo.getApplicationInfo().packageName.equals(BuildConfig.APPLICATION_ID))
+                        appList.add(new AppModel(
+                                activityInfo.getLabel().toString(),
+                                activityInfo.getApplicationInfo().packageName,
+                                profile));
+            }
+            Collections.sort(appList, (obj1, obj2) -> obj1.appLabel.compareToIgnoreCase(obj2.appLabel));
+        }).start();
     }
 
     private void showAppList(int flag) {
