@@ -56,6 +56,8 @@ public class MainActivity extends Activity implements View.OnClickListener, View
 
     public interface AppClickListener {
         void appClicked(AppModel appModel, int flag);
+
+        void appLongPress(AppModel appModel);
     }
 
     @Override
@@ -297,6 +299,13 @@ public class MainActivity extends Activity implements View.OnClickListener, View
         }
     }
 
+    private void openAppInfo(AppModel appModel) {
+        LauncherApps launcher = (LauncherApps) getSystemService(Context.LAUNCHER_APPS_SERVICE);
+        Intent intent = getPackageManager().getLaunchIntentForPackage(appModel.appPackage);
+        if (intent == null || intent.getComponent() == null) return;
+        launcher.startAppDetailsActivity(intent.getComponent(), appModel.userHandle, null, null);
+    }
+
     private void setHomeApp(AppModel appModel, int flag) {
         prefs.setHomeApp(appModel, flag);
         backToHome();
@@ -314,7 +323,7 @@ public class MainActivity extends Activity implements View.OnClickListener, View
         intent.setAction(Intent.ACTION_MAIN);
         intent.addCategory(Intent.CATEGORY_HOME);
         ResolveInfo result = getPackageManager().resolveActivity(intent, 0);
-        if (result == null && result.activityInfo == null)
+        if (result == null || result.activityInfo == null)
             return "android";
         return result.activityInfo.packageName;
     }
@@ -421,9 +430,18 @@ public class MainActivity extends Activity implements View.OnClickListener, View
     }
 
     private AppClickListener getAppClickListener() {
-        return (appModel, flag) -> {
-            if (flag == FLAG_LAUNCH_APP) prepareToLaunchApp(appModel);
-            else setHomeApp(appModel, flag);
+        return new AppClickListener() {
+            @Override
+            public void appClicked(AppModel appModel, int flag) {
+                if (flag == FLAG_LAUNCH_APP) prepareToLaunchApp(appModel);
+                else setHomeApp(appModel, flag);
+            }
+
+            @Override
+            public void appLongPress(AppModel appModel) {
+                hideKeyboard();
+                openAppInfo(appModel);
+            }
         };
     }
 
@@ -583,6 +601,11 @@ public class MainActivity extends Activity implements View.OnClickListener, View
             viewHolder.appName.setOnClickListener(view -> {
                 AppModel clickedAppModel = (AppModel) viewHolder.appName.getTag();
                 appClickListener.appClicked(clickedAppModel, flag);
+            });
+            viewHolder.appName.setOnLongClickListener(view -> {
+                AppModel clickedAppModel = (AppModel) viewHolder.appName.getTag();
+                appClickListener.appLongPress(clickedAppModel);
+                return true;
             });
             if (appModel.userHandle == android.os.Process.myUserHandle())
                 viewHolder.indicator.setVisibility(View.GONE);
