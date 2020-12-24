@@ -46,6 +46,7 @@ public class MainActivity extends Activity implements View.OnClickListener, View
     private Prefs prefs;
     private View appDrawer;
     private EditText search;
+    private ListView appListView;
     private AppAdapter appAdapter;
     private LinearLayout homeAppsLayout;
     private TextView homeApp1, homeApp2, homeApp3, homeApp4, homeApp5, homeApp6, setDefaultLauncher;
@@ -74,7 +75,7 @@ public class MainActivity extends Activity implements View.OnClickListener, View
         appDrawer = findViewById(R.id.app_drawer_layout);
 
         appAdapter = new AppAdapter(this, appList, getAppClickListener());
-        ListView appListView = findViewById(R.id.app_list_view);
+        appListView = findViewById(R.id.app_list_view);
         appListView.setAdapter(appAdapter);
 
         search.addTextChangedListener(new TextWatcher() {
@@ -174,6 +175,7 @@ public class MainActivity extends Activity implements View.OnClickListener, View
         appAdapter.setFlag(FLAG_LAUNCH_APP);
         hideKeyboard();
         checkForDefaultLauncher();
+        appListView.setSelectionAfterHeaderView();
     }
 
     private void refreshAppsList() {
