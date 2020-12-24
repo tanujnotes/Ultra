@@ -110,7 +110,6 @@ public class MainActivity extends Activity implements View.OnClickListener, View
         populateHomeApps();
         refreshAppsList();
         showNavBarAndResetScreenTimeout();
-        checkForDefaultLauncher();
     }
 
     @Override
@@ -188,6 +187,7 @@ public class MainActivity extends Activity implements View.OnClickListener, View
         appAdapter.setFlag(FLAG_LAUNCH_APP);
         hideKeyboard();
         appListView.setSelectionAfterHeaderView();
+        checkForDefaultLauncher();
     }
 
     private void refreshAppsList() {
