@@ -43,8 +43,8 @@ import java.util.List;
 import static android.view.WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
 
 public class MainActivity extends Activity implements View.OnClickListener, View.OnLongClickListener {
-    private final List<AppModel> appList = new ArrayList<>();
     private final int FLAG_LAUNCH_APP = 0;
+    private final List<AppModel> appList = new ArrayList<>();
 
     private Prefs prefs;
     private View appDrawer, blackScreen;
@@ -192,18 +192,24 @@ public class MainActivity extends Activity implements View.OnClickListener, View
 
     private void refreshAppsList() {
         new Thread(() -> {
-            appList.clear();
-            UserManager userManager = (UserManager) getSystemService(Context.USER_SERVICE);
-            LauncherApps launcherApps = (LauncherApps) getSystemService(Context.LAUNCHER_APPS_SERVICE);
-            for (UserHandle profile : userManager.getUserProfiles()) {
-                for (LauncherActivityInfo activityInfo : launcherApps.getActivityList(null, profile))
-                    if (!activityInfo.getApplicationInfo().packageName.equals(BuildConfig.APPLICATION_ID))
-                        appList.add(new AppModel(
-                                activityInfo.getLabel().toString(),
-                                activityInfo.getApplicationInfo().packageName,
-                                profile));
+            try {
+                List<AppModel> apps = new ArrayList<>();
+                UserManager userManager = (UserManager) getSystemService(Context.USER_SERVICE);
+                LauncherApps launcherApps = (LauncherApps) getSystemService(Context.LAUNCHER_APPS_SERVICE);
+                for (UserHandle profile : userManager.getUserProfiles()) {
+                    for (LauncherActivityInfo activityInfo : launcherApps.getActivityList(null, profile))
+                        if (!activityInfo.getApplicationInfo().packageName.equals(BuildConfig.APPLICATION_ID))
+                            apps.add(new AppModel(
+                                    activityInfo.getLabel().toString(),
+                                    activityInfo.getApplicationInfo().packageName,
+                                    profile));
+                }
+                Collections.sort(apps, (app1, app2) -> app1.appLabel.compareToIgnoreCase(app2.appLabel));
+                appList.clear();
+                appList.addAll(apps);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            Collections.sort(appList, (obj1, obj2) -> obj1.appLabel.compareToIgnoreCase(obj2.appLabel));
         }).start();
     }
 
