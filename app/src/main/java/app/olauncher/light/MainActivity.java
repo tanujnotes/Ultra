@@ -56,6 +56,7 @@ public class MainActivity extends Activity implements View.OnClickListener, View
     private AppAdapter appAdapter;
     private LinearLayout homeAppsLayout;
     private TextView homeApp1, homeApp2, homeApp3, homeApp4, homeApp5, homeApp6, setDefaultLauncher;
+    private long clickedAt = 0;
 
     public interface AppClickListener {
         void appClicked(AppModel appModel, int flag);
@@ -125,7 +126,8 @@ public class MainActivity extends Activity implements View.OnClickListener, View
             resetDefaultLauncher();
             return;
         } else if (view.getId() == R.id.black_screen) {
-            onResume();
+            if (clickedAt + 400 > System.currentTimeMillis()) onResume();
+            clickedAt = System.currentTimeMillis();
             return;
         }
         try {
@@ -386,7 +388,7 @@ public class MainActivity extends Activity implements View.OnClickListener, View
     private void showLockPopup() {
         String[] options = {"YES", "NO", "DON'T SHOW AGAIN"};
         new AlertDialog.Builder(this)
-                .setTitle("Enable double tap to lock?")
+                .setTitle("Enable double tap to lock/unlock?")
                 .setItems(options, (dialog, which) -> {
                     switch (which) {
                         case 0:
