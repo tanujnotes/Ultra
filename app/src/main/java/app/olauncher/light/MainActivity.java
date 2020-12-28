@@ -47,6 +47,7 @@ import static android.view.WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
 
 public class MainActivity extends Activity implements View.OnClickListener, View.OnLongClickListener {
     private final int FLAG_LAUNCH_APP = 0;
+    private final int LOCK_SCREEN_TIMEOUT = 5000; // 5 seconds
     private final List<AppModel> appList = new ArrayList<>();
 
     private Prefs prefs;
@@ -407,11 +408,12 @@ public class MainActivity extends Activity implements View.OnClickListener, View
     private void setScreenTimeout() {
         try {
             int screenTimeoutInMillis = Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT);
-            if (screenTimeoutInMillis >= 5000) prefs.setScreenTimeout(screenTimeoutInMillis);
+            if (screenTimeoutInMillis >= LOCK_SCREEN_TIMEOUT)
+                prefs.setScreenTimeout(screenTimeoutInMillis);
         } catch (Settings.SettingNotFoundException e) {
             e.printStackTrace();
         }
-        Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT, 5000);
+        Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT, LOCK_SCREEN_TIMEOUT);
     }
 
     private void hideNavBar() {
@@ -426,8 +428,17 @@ public class MainActivity extends Activity implements View.OnClickListener, View
     }
 
     private void showNavBarAndResetScreenTimeout() {
-        if (Settings.System.canWrite(this))
-            Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT, prefs.getScreenTimeout());
+        try {
+            if (Settings.System.canWrite(this)) {
+                int screenTimeoutInMillis = Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT);
+                if (screenTimeoutInMillis <= LOCK_SCREEN_TIMEOUT)
+                    Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT, prefs.getScreenTimeout());
+                else
+                    Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT, screenTimeoutInMillis);
+            }
+        } catch (Settings.SettingNotFoundException e) {
+            e.printStackTrace();
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             getWindow().getInsetsController().show(WindowInsets.Type.navigationBars());
         } else
