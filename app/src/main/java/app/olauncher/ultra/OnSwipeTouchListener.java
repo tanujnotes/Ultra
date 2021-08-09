@@ -1,4 +1,6 @@
-package app.olauncher.light;
+package app.olauncher.ultra;
+
+import static java.lang.Math.abs;
 
 import android.content.Context;
 import android.view.GestureDetector;
@@ -7,8 +9,6 @@ import android.view.View;
 
 import java.util.Timer;
 import java.util.TimerTask;
-
-import static java.lang.Math.abs;
 
 public class OnSwipeTouchListener implements View.OnTouchListener {
 

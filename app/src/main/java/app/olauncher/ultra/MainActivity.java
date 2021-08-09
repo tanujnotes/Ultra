@@ -1,8 +1,9 @@
-package app.olauncher.light;
+package app.olauncher.ultra;
+
+import static android.view.WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -20,12 +21,10 @@ import android.provider.MediaStore;
 import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.view.WindowInsets;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
@@ -43,21 +42,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static android.view.WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
-
 public class MainActivity extends Activity implements View.OnClickListener, View.OnLongClickListener {
     private final int FLAG_LAUNCH_APP = 0;
-    private final int LOCK_SCREEN_TIMEOUT = 5000; // 5 seconds
     private final List<AppModel> appList = new ArrayList<>();
 
     private Prefs prefs;
-    private View appDrawer, blackScreen;
+    private View appDrawer;
     private EditText search;
     private ListView appListView;
     private AppAdapter appAdapter;
     private LinearLayout homeAppsLayout;
     private TextView homeApp1, homeApp2, homeApp3, homeApp4, homeApp5, homeApp6, setDefaultLauncher;
-    private long clickedAt = 0;
 
     public interface AppClickListener {
         void appClicked(AppModel appModel, int flag);
@@ -114,21 +109,15 @@ public class MainActivity extends Activity implements View.OnClickListener, View
     @Override
     protected void onResume() {
         super.onResume();
-        blackScreen.setVisibility(View.GONE);
         backToHome();
         populateHomeApps();
         refreshAppsList();
-        showNavBarAndResetScreenTimeout();
     }
 
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.set_as_default_launcher) {
             resetDefaultLauncher();
-            return;
-        } else if (view.getId() == R.id.black_screen) {
-            if (clickedAt + 400 > System.currentTimeMillis()) onResume();
-            clickedAt = System.currentTimeMillis();
             return;
         }
         try {
@@ -153,8 +142,6 @@ public class MainActivity extends Activity implements View.OnClickListener, View
     private void initClickListeners() {
         setDefaultLauncher = findViewById(R.id.set_as_default_launcher);
         setDefaultLauncher.setOnClickListener(this);
-        blackScreen = findViewById(R.id.black_screen);
-        blackScreen.setOnClickListener(this);
 
         homeApp1 = findViewById(R.id.home_app_1);
         homeApp2 = findViewById(R.id.home_app_2);
@@ -242,23 +229,6 @@ public class MainActivity extends Activity implements View.OnClickListener, View
         search.clearFocus();
         InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(search.getWindowToken(), 0);
-    }
-
-    private void changeHomeAppAlignment() {
-        switch (prefs.getHomeAlignment()) {
-            default:
-                homeAppsLayout.setGravity(Gravity.CENTER);
-                prefs.setHomeAlignment(Gravity.CENTER);
-                break;
-            case Gravity.CENTER:
-                homeAppsLayout.setGravity(Gravity.END);
-                prefs.setHomeAlignment(Gravity.END);
-                break;
-            case Gravity.END:
-                homeAppsLayout.setGravity(Gravity.START);
-                prefs.setHomeAlignment(Gravity.START);
-                break;
-        }
     }
 
     @SuppressLint({"WrongConstant", "PrivateApi"})
@@ -386,75 +356,6 @@ public class MainActivity extends Activity implements View.OnClickListener, View
         startActivity(intent);
     }
 
-    private void showLockPopup() {
-        String[] options = {"YES", "NO", "DON'T SHOW AGAIN"};
-        new AlertDialog.Builder(this)
-                .setTitle("Enable double tap to lock/unlock?")
-                .setItems(options, (dialog, which) -> {
-                    switch (which) {
-                        case 0:
-                            openEditSettingsPermission();
-                            break;
-                        case 1:
-                            dialog.dismiss();
-                            break;
-                        case 2:
-                            prefs.setShowLockPopup(false);
-                            break;
-                    }
-                }).show();
-    }
-
-    private void setScreenTimeout() {
-        try {
-            int screenTimeoutInMillis = Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT);
-            if (screenTimeoutInMillis >= LOCK_SCREEN_TIMEOUT)
-                prefs.setScreenTimeout(screenTimeoutInMillis);
-        } catch (Settings.SettingNotFoundException e) {
-            e.printStackTrace();
-        }
-        Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT, LOCK_SCREEN_TIMEOUT);
-    }
-
-    private void hideNavBar() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            getWindow().getInsetsController().hide(WindowInsets.Type.statusBars());
-            getWindow().getInsetsController().hide(WindowInsets.Type.navigationBars());
-        } else {
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_IMMERSIVE
-                    | View.SYSTEM_UI_FLAG_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
-        }
-    }
-
-    private void showNavBarAndResetScreenTimeout() {
-        try {
-            if (Settings.System.canWrite(this)) {
-                int screenTimeoutInMillis = Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT);
-                if (screenTimeoutInMillis <= LOCK_SCREEN_TIMEOUT)
-                    Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT, prefs.getScreenTimeout());
-                else
-                    Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT, screenTimeoutInMillis);
-            }
-        } catch (Settings.SettingNotFoundException e) {
-            e.printStackTrace();
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            getWindow().getInsetsController().show(WindowInsets.Type.navigationBars());
-        } else
-            getWindow().getDecorView().setSystemUiVisibility(
-                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
-    }
-
-    private void checkForDoubleTap() {
-        if (Settings.System.canWrite(this)) {
-            blackScreen.setVisibility(View.VISIBLE);
-            setScreenTimeout();
-            hideNavBar();
-        } else if (prefs.getShowLockPopup())
-            showLockPopup();
-    }
-
     private AppClickListener getAppClickListener() {
         return new AppClickListener() {
             @Override
@@ -540,12 +441,10 @@ public class MainActivity extends Activity implements View.OnClickListener, View
 
             @Override
             public void onLongClick() {
-                runOnUiThread(() -> changeHomeAppAlignment());
             }
 
             @Override
             public void onDoubleClick() {
-                checkForDoubleTap();
                 super.onDoubleClick();
             }
 
