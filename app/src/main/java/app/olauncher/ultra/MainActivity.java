@@ -341,7 +341,7 @@ public class MainActivity extends Activity implements View.OnClickListener, View
 
     private void openLauncherPhoneSettings() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            Toast.makeText(this, "Set Olauncher Light as default launcher", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Set Ultra as default launcher", Toast.LENGTH_LONG).show();
             startActivity(new Intent(Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS));
         } else {
             Toast.makeText(this, "Search for launcher or home apps", Toast.LENGTH_LONG).show();

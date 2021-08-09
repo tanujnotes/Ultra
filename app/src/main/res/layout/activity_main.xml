@@ -147,7 +147,7 @@
         android:layout_gravity="bottom|center_horizontal"
         android:layout_marginBottom="42dp"
         android:padding="8dp"
-        android:text="Set as default launcher"
+        android:text="Set Ultra as default launcher"
         android:textColor="@android:color/white"
         android:textSize="18sp"
         android:visibility="gone"

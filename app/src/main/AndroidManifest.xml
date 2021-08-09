@@ -4,14 +4,13 @@
 
     <uses-permission android:name="android.permission.EXPAND_STATUS_BAR" />
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
-    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
 
     <application
         android:allowBackup="true"
         android:fullBackupOnly="true"
-        android:icon="@drawable/logo"
-        android:label="Olauncher Light"
-        android:roundIcon="@drawable/logo">
+        android:icon="@drawable/ic_ultra"
+        android:label="Ultra"
+        android:roundIcon="@drawable/ic_ultra">
 
         <activity
             android:name=".MainActivity"

@@ -6,8 +6,7 @@ import android.view.Gravity;
 
 public class Prefs {
 
-    private static final String PREF = "app.olauncher.light";
-    private static final String SCREEN_TIMEOUT = "SCREEN_TIMEOUT";
+    private static final String PREF = "app.olauncher.ultra";
 
     private static final String APP_NAME_1 = "APP_NAME_1";
     private static final String APP_NAME_2 = "APP_NAME_2";
@@ -37,10 +36,6 @@ public class Prefs {
 
     private SharedPreferences getSharedPref() {
         return sharedPreferences;
-    }
-
-    public void setScreenTimeout(int value) {
-        getSharedPref().edit().putInt(SCREEN_TIMEOUT, value).apply();
     }
 
     public String getAppName(int location) {

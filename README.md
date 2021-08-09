@@ -15,4 +15,4 @@ Minimal launcher app for Android (22kB)
 
 
 
-![Olauncher Light](https://repository-images.githubusercontent.com/323623218/d42f8900-661a-11eb-8fac-353d9e35399b)
+![Ultra](https://repository-images.githubusercontent.com/323623218/d42f8900-661a-11eb-8fac-353d9e35399b)
