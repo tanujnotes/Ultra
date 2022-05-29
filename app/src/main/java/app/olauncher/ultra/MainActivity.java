@@ -17,6 +17,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.UserHandle;
 import android.os.UserManager;
+import android.provider.AlarmClock;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.text.Editable;
@@ -116,15 +117,22 @@ public class MainActivity extends Activity implements View.OnClickListener, View
 
     @Override
     public void onClick(View view) {
-        if (view.getId() == R.id.set_as_default_launcher) {
+        int viewId = view.getId();
+        if (viewId == R.id.set_as_default_launcher) {
             resetDefaultLauncher();
-            return;
-        }
-        try {
-            int location = Integer.parseInt(view.getTag().toString());
-            homeAppClicked(location);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } else if (viewId == R.id.clock) {
+            startActivity(new Intent(new Intent(AlarmClock.ACTION_SHOW_ALARMS)));
+        } else if (viewId == R.id.date) {
+            Intent intent = new Intent(Intent.ACTION_MAIN);
+            intent.addCategory(Intent.CATEGORY_APP_CALENDAR);
+            startActivity(intent);
+        } else {
+            try {
+                int location = Integer.parseInt(view.getTag().toString());
+                homeAppClicked(location);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -142,6 +150,9 @@ public class MainActivity extends Activity implements View.OnClickListener, View
     private void initClickListeners() {
         setDefaultLauncher = findViewById(R.id.set_as_default_launcher);
         setDefaultLauncher.setOnClickListener(this);
+
+        findViewById(R.id.clock).setOnClickListener(this);
+        findViewById(R.id.date).setOnClickListener(this);
 
         homeApp1 = findViewById(R.id.home_app_1);
         homeApp2 = findViewById(R.id.home_app_2);
